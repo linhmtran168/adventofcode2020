@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	d1 "github.com/linhmtran168/adventofcode2020/day1"
+	d2 "github.com/linhmtran168/adventofcode2020/day2"
 )
 
 type Advent interface {
@@ -22,6 +23,8 @@ func main() {
 	switch probDay {
 	case 1:
 		problem = &(d1.Day1{})
+	case 2:
+		problem = &(d2.Day2{})
 	default:
 		panic("Invalid problem!")
 	}
