@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-type Day1 struct{}
+type Problem struct{}
 
 func readInput(filePath string) (numLst []int, err error) {
 	file, err := os.Open(filePath)
@@ -29,7 +29,7 @@ func readInput(filePath string) (numLst []int, err error) {
 	return
 }
 
-func (adv *Day1) Solve() {
+func (adv *Problem) Solve() {
 	numbers, err := readInput("day1/input.txt")
 
 	if err != nil {

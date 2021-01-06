@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-type Day2 struct{}
+type Problem struct{}
 
 type Password struct {
 	Min  int
@@ -18,7 +18,7 @@ type Password struct {
 	Pass string
 }
 
-func (adv *Day2) Solve() {
+func (adv *Problem) Solve() {
 	passwords, err := readInput("day2/input.txt")
 	if err != nil {
 		panic(err)
