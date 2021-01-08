@@ -4,70 +4,72 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
+
+	u "github.com/linhmtran168/adventofcode2020/utils"
 )
 
 type Problem struct{}
 
 func (adv *Problem) Solve() {
-	toboggan, err := readInput("day3/input.txt")
+	rawPassports, err := readInput("day4/input.txt")
 	if err != nil {
 		panic(err)
 	}
-	listSteps := [][]int{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}}
 
-	res := 1
-	for _, s := range listSteps {
-		numTree := walkField(s[0], s[1], toboggan)
-		fmt.Printf("Number of tree: %d\n", numTree)
-		res *= numTree
-	}
+	numValid := 0
+	requiredAttrs := []string{"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}
+	numRequiredAttrs := len(requiredAttrs)
+	for _, p := range rawPassports {
+		pAttrs := strings.Fields(p)
+		var validAttrNames []string
+		for _, attr := range pAttrs {
+			subAttr := strings.Split(attr, ":")
+			attrName, _ := subAttr[0], subAttr[1]
 
-	fmt.Printf("Final result: %d", res)
-}
+			if _, isValid := u.FindString(requiredAttrs, attrName); isValid {
+				if _, added := u.FindString(validAttrNames, attrName); !added {
+					validAttrNames = append(validAttrNames, attrName)
+				}
+			}
 
-func walkField(stepX int, stepY int, fields [][]int) int {
-	tHeight := len(fields)
-	tWidth := len(fields[0])
-
-	numTree := 0
-	posX := 0
-	for i := 0; i < tHeight; i += stepY {
-		if fields[i][posX] == 1 {
-			numTree++
 		}
 
-		newPosX := posX + stepX
-
-		if newPosX >= tWidth {
-			posX = newPosX - tWidth
-		} else {
-			posX = newPosX
+		if numRequiredAttrs == len(validAttrNames) {
+			numValid++
 		}
 	}
 
-	return numTree
+	fmt.Printf("Num passport valid: %d\n", numValid)
 }
 
-func readInput(filePath string) (toboggan [][]int, err error) {
+func readInput(filePath string) (output []string, err error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		var lineArr []int
-		for _, char := range line {
-			if char == '.' {
-				lineArr = append(lineArr, 0)
-			} else {
-				lineArr = append(lineArr, 1)
+	scanDouble := func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+		dataLen := len(data)
+		for i := 0; i < dataLen-1; i++ {
+			if data[i] == '\n' && data[i+1] == '\n' {
+				return i + 2, data[:i], nil
 			}
 		}
 
-		toboggan = append(toboggan, lineArr)
+		if atEOF && dataLen > 0 {
+			return dataLen, data, nil
+		}
+
+		return 0, nil, nil
+	}
+
+	scanner := bufio.NewScanner(file)
+	scanner.Split(scanDouble)
+	for scanner.Scan() {
+		line := scanner.Text()
+		output = append(output, strings.TrimSpace(line))
 	}
 
 	return

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sync"
 )
 
 type Problem struct{}
@@ -14,15 +15,32 @@ func (adv *Problem) Solve() {
 		panic(err)
 	}
 	listSteps := [][]int{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}}
+	numSteps := len(listSteps)
 
-	res := 1
+	var wg sync.WaitGroup
+	wg.Add(numSteps)
+	resChan := make(chan int, numSteps)
+
 	for _, s := range listSteps {
-		numTree := walkField(s[0], s[1], toboggan)
-		fmt.Printf("Number of tree: %d\n", numTree)
-		res *= numTree
+		go func(stepX int, stepY int) {
+			defer wg.Done()
+			numTree := walkField(stepX, stepY, toboggan)
+			fmt.Printf("Number of tree: %d\n", numTree)
+			resChan <- numTree
+		}(s[0], s[1])
 	}
 
-	fmt.Printf("Final result: %d", res)
+	go func() {
+		wg.Wait()
+		close(resChan)
+	}()
+
+	res := 1
+	for stepRes := range resChan {
+		res *= stepRes
+	}
+
+	fmt.Printf("Final result: %d\n", res)
 }
 
 func walkField(stepX int, stepY int, fields [][]int) int {
