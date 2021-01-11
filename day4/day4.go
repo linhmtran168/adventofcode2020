@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
+	"strconv"
 	"strings"
 
 	u "github.com/linhmtran168/adventofcode2020/utils"
@@ -17,26 +19,65 @@ func (adv *Problem) Solve() {
 		panic(err)
 	}
 
-	numValid := 0
 	requiredAttrs := []string{"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}
+	requiredAttrRegexes := map[string]*regexp.Regexp{
+		"hgt": regexp.MustCompile(`^(\d+)(cm|in)$`),
+		"hcl": regexp.MustCompile(`^#[0-9a-f]{6}$`),
+		"ecl": regexp.MustCompile(`^(amb|blu|brn|gry|grn|hzl|oth)$`),
+		"pid": regexp.MustCompile(`^\d{9}$`),
+	}
+
+	isValueValid := func(attrName string, attrVal string) bool {
+		switch attrName {
+		case "byr":
+			val, err := strconv.Atoi(attrVal)
+			return err == nil && val >= 1920 && val <= 2002
+		case "iyr":
+			val, err := strconv.Atoi(attrVal)
+			return err == nil && val >= 2010 && val <= 2020
+		case "eyr":
+			val, err := strconv.Atoi(attrVal)
+			return err == nil && val >= 2020 && val <= 2030
+		case "hgt":
+			val := requiredAttrRegexes[attrName].FindStringSubmatch(attrVal)
+			if val == nil || len(val) != 3 {
+				return false
+			}
+
+			hgtVal, err := strconv.Atoi(val[1])
+			if err != nil {
+				return false
+			}
+
+			return (val[2] == "in" && hgtVal >= 59 && hgtVal <= 76) || (val[2] == "cm" && hgtVal >= 150 && hgtVal <= 193)
+		case "hcl", "ecl", "pid":
+			return requiredAttrRegexes[attrName].Match([]byte(attrVal))
+		}
+
+		return false
+	}
+
+	numValid := 0
 	numRequiredAttrs := len(requiredAttrs)
 	for _, p := range rawPassports {
 		pAttrs := strings.Fields(p)
 		var validAttrNames []string
+		// passpost := ""
 		for _, attr := range pAttrs {
 			subAttr := strings.Split(attr, ":")
-			attrName, _ := subAttr[0], subAttr[1]
+			attrName, attrVal := subAttr[0], subAttr[1]
 
-			if _, isValid := u.FindString(requiredAttrs, attrName); isValid {
-				if _, added := u.FindString(validAttrNames, attrName); !added {
+			if _, isNameValid := u.FindString(requiredAttrs, attrName); isNameValid {
+				if _, added := u.FindString(validAttrNames, attrName); !added && isValueValid(attrName, attrVal) {
 					validAttrNames = append(validAttrNames, attrName)
+					// passpost = passpost + fmt.Sprintf("%s - %s ", attrName, attrVal)
 				}
 			}
-
 		}
 
 		if numRequiredAttrs == len(validAttrNames) {
 			numValid++
+			// fmt.Printf("%s\n", passpost)
 		}
 	}
 
