@@ -37,11 +37,13 @@ func (adv *Problem) Solve() {
 	}
 
 	maxSeatID := 0
+	seatHotcodes := make([]int, 128*8)
 	for _, code := range seatCodes {
 		row := findValue('F', code.row, 0, 127)
 		col := findValue('L', code.column, 0, 7)
 		seatID := row*8 + col
 
+		seatHotcodes[seatID] = 1
 		if seatID > maxSeatID {
 			maxSeatID = seatID
 		}
@@ -49,7 +51,19 @@ func (adv *Problem) Solve() {
 		fmt.Printf("%s%s:row %d, column %d, seat ID %d\n", code.row, code.column, row, col, seatID)
 	}
 
+	validSeatID := 0
+	for idx, val := range seatHotcodes {
+		if idx == 0 || idx == len(seatHotcodes)-1 {
+			continue
+		}
+
+		if seatHotcodes[idx-1] != 0 && seatHotcodes[idx+1] != 0 && val == 0 {
+			validSeatID = idx
+		}
+	}
+
 	fmt.Printf("Max Seat ID: %d\n", maxSeatID)
+	fmt.Printf("Valid Sead ID: %d\n", validSeatID)
 }
 
 func readInput(filePath string) (output []*seatCode, err error) {
