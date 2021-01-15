@@ -48,7 +48,7 @@ func (adv *Problem) Solve() {
 			maxSeatID = seatID
 		}
 
-		fmt.Printf("%s%s:row %d, column %d, seat ID %d\n", code.row, code.column, row, col, seatID)
+		// fmt.Printf("%s%s:row %d, column %d, seat ID %d\n", code.row, code.column, row, col, seatID)
 	}
 
 	validSeatID := 0
@@ -59,6 +59,7 @@ func (adv *Problem) Solve() {
 
 		if seatHotcodes[idx-1] != 0 && seatHotcodes[idx+1] != 0 && val == 0 {
 			validSeatID = idx
+			break
 		}
 	}
 
