@@ -11,6 +11,7 @@ import (
 	d3 "github.com/linhmtran168/adventofcode2020/day3"
 	d4 "github.com/linhmtran168/adventofcode2020/day4"
 	d5 "github.com/linhmtran168/adventofcode2020/day5"
+	d6 "github.com/linhmtran168/adventofcode2020/day6"
 )
 
 type Advent interface {
@@ -36,6 +37,8 @@ func main() {
 		problem = &d4.Problem{}
 	case 5:
 		problem = &d5.Problem{}
+	case 6:
+		problem = &d6.Problem{}
 	default:
 		panic("Invalid problem!")
 	}
