@@ -26,11 +26,7 @@ func partOne(answers [][]string) int {
 		uniqAns := make(map[rune]int)
 		for _, people := range group {
 			for _, ans := range people {
-				if val, ok := uniqAns[ans]; ok {
-					uniqAns[ans] = val + 1
-				} else {
-					uniqAns[ans] = 1
-				}
+				uniqAns[ans]++
 			}
 		}
 
@@ -45,19 +41,8 @@ func partTwo(answers [][]string) int {
 	for _, group := range answers {
 		uniqAnsGrp := make(map[rune]int)
 		for _, people := range group {
-			uniqAns := make(map[rune]int)
 			for _, ans := range people {
-				if _, ok := uniqAns[ans]; !ok {
-					uniqAns[ans] = 1
-				}
-			}
-
-			for k := range uniqAns {
-				if val, ok := uniqAnsGrp[k]; ok {
-					uniqAnsGrp[k] = val + 1
-				} else {
-					uniqAnsGrp[k] = 1
-				}
+				uniqAnsGrp[ans]++
 			}
 		}
 
